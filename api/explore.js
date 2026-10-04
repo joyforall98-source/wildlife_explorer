@@ -33,10 +33,10 @@ module.exports = async function handler(req, res) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: "solar-1-mini-chat",
+                model: "solar-mini",
                 messages: [
                     { role: "system", content: SYSTEM_PROMPT },
-                    { role: "user", content: keyword }
+                    { role: "user", content: '생물 이름: "' + keyword + '"\n반드시 이 생물에 대해서만 설명해줘.' }
                 ],
                 temperature: 0.7,
                 max_tokens: 600
