@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>야생생물 생태 도우미 탐험대</title>
+    <!-- Tailwind CSS 및 Pretendard 폰트 동적 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        explorer: {
+                            navyDark: '#0f172a',
+                            navyMain: '#1e3a8a',
+                            navyLight: '#3b82f6',
+                            bg: '#f8fafc'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-explorer-bg font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- 상단 헤더 -->
+    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🐾</span>
+                <h1 class="text-base font-bold text-explorer-navyDark tracking-tight">
+                    야생생물 <span class="text-explorer-navyMain font-extrabold">생태 도우미 탐험대</span>
+                </h1>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-500 font-semibold px-2.5 py-1 rounded-md border border-slate-200/60">AI 생태 가이드</span>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="flex-grow max-w-3xl w-full mx-auto px-6 py-12">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
+                궁금한 야생생물의 <span class="text-explorer-navyMain">비밀</span>을 찾아보세요!
+            </h2>
+            <p class="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+                조사하고 싶은 동물이나 식물의 이름을 입력하면, AI 탐험대장이 서식지부터 재미있는 비하인드 스토리까지 친절하게 들려줍니다.
+            </p>
+        </div>
+
+        <!-- 검색 영역 -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/60 mb-8">
+            <div class="flex gap-2">
+                <input type="text" id="biologyInput" placeholder="예: 반달가슴곰, 수달, 호랑이 등" 
+                       class="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-explorer-navyMain focus:bg-white transition-all">
+                <button onclick="searchBiology()" 
+                        class="bg-explorer-navyMain hover:bg-explorer-navyDark text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm shrink-0">
+                    탐색 시작 🔎
+                </button>
+            </div>
+        </div>
+
+        <!-- 결과 출력 영역 -->
+        <div id="resultArea" class="hidden space-y-5">
+            
+            <!-- 1:1 비율 메인 썸네일 엠블럼 카드 -->
+            <div class="w-full max-w-sm mx-auto aspect-square rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-950 p-8 flex flex-col items-center justify-between shadow-2xl border border-slate-800 relative overflow-hidden mb-8">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-600/20 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-600/10 rounded-full blur-2xl"></div>
+
+                <span class="text-[10px] font-black tracking-widest text-blue-400 uppercase bg-blue-950/60 border border-blue-800/50 px-3 py-1 rounded-full z-10">
+                    WILDLIFE ECO
+                </span>
+
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-slate-800 to-slate-700/50 border border-slate-700/60 flex items-center justify-center text-5xl shadow-inner z-10">
+                    <span id="bioIcon">🐾</span>
+                </div>
+
+                <div class="text-center z-10">
+                    <h4 id="bioTitle" class="text-xl font-extrabold text-white tracking-wide">생물 이름</h4>
+                    <p class="text-[10px] text-slate-500 font-medium mt-1">AI EXPLORER CAMP</p>
+                </div>
+            </div>
+
+            <!-- 세부 지식 정보 카드 레이아웃 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="text-sm">🏡</span>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase">어디에 살고 있을까?</h4>
+                    </div>
+                    <p id="bioHabitat" class="text-sm font-bold text-slate-800 leading-relaxed">서식지 정보</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm md:col-span-2">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="text-sm">🔍</span>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase">생김새와 핵심 특징</h4>
+                    </div>
+                    <p id="bioFeatures" class="text-sm text-slate-600 leading-relaxed font-medium">생김새와 특징 정보</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm md:col-span-3 bg-gradient-to-br from-white to-slate-50/50">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="text-sm">✨</span>
+                        <h4 class="text-xs font-bold text-explorer-navyMain uppercase">재미있는 비하인드 스토리</h4>
+                    </div>
+                    <p id="bioStory" class="text-sm text-slate-600 leading-relaxed italic font-medium">비하인드 스토리 정보</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로딩 영역 -->
+        <div id="loadingArea" class="hidden py-12 text-center">
+            <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-explorer-navyMain rounded-full mb-3"></div>
+            <p class="text-xs font-semibold text-slate-400">AI 탐험대장이 도감을 분석하고 있습니다...</p>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200/60 py-6 text-center">
+        <p class="text-xs text-slate-400 font-medium">© 2026 야생생물 생태 도우미 탐험대. All 교육 목적 포트폴리오.</p>
+    </footer>
+
+    <!-- 자바스크립트 로직 제어 영역 -->
+    <script>
+        async function searchBiology() {
+            const inputField = document.getElementById('biologyInput');
+            const keyword = inputField.value.trim();
+
+            if (!keyword) {
+                alert('조사하고 싶은 생물의 이름을 입력해 주세요! 🐾');
+                return;
+            }
+
+            const resultArea = document.getElementById('resultArea');
+            const loadingArea = document.getElementById('loadingArea');
+
+            // UI 초기화
+            resultArea.classList.add('hidden');
+            loadingArea.classList.remove('hidden');
+
+            try {
+                // 🔒 API 키는 서버(Vercel 함수 /api/explore)에만 있으며, 브라우저는 생물 이름만 보냅니다.
+                const response = await fetch('/api/explore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keyword: keyword })
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || ('서버 오류 상태코드: ' + response.status));
+                }
+
+                // 화면 레이아웃 노드에 데이터 결합
+                document.getElementById('bioTitle').innerText = keyword;
+                document.getElementById('bioIcon').innerText = "🐾";
+                document.getElementById('bioHabitat').innerText = data.habitat;
+                document.getElementById('bioFeatures').innerText = data.features;
+                document.getElementById('bioStory').innerText = data.story;
+
+                // 로딩 감추고 결과 표시
+                loadingArea.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+
+                // 입력창 편의성 초기화
+                inputField.value = '';
+                inputField.focus();
+
+            } catch (error) {
+                console.error(error);
+                alert('도감을 가져오는 데 실패했습니다. 원인: ' + error.message);
+                loadingArea.classList.add('hidden');
+            }
+        }
+
+        // 엔터키 리스너 바인딩
+        document.getElementById('biologyInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBiology();
+            }
+        });
+    </script>
+</body>
+</html>

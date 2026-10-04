@@ -1,0 +1,5 @@
+# 배포에서 제외할 파일 (키 파일, 백업본)
+config.js
+.env
+.env.*
+index-before-vercel.html
