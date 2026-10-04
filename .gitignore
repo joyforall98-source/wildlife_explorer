@@ -1,0 +1,6 @@
+# 🔒 API 키가 들어 있는 파일은 절대 올리지 않습니다
+config.js
+.env
+.env.*
+!.env.example
+.vercel
