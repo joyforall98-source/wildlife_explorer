@@ -6,6 +6,10 @@ const SYSTEM_PROMPT = "너는 초등학생들을 위한 친절하고 재미있�
 // 생물 이름 입력 길이 제한 (API 남용 방지)
 const MAX_KEYWORD_LENGTH = 30;
 
+// 학생 화면에 보일 안내. 실제 원인(상태코드·Upstage 응답)은 Vercel 기록(Logs)에만 남깁니다
+const RESTING = 'AI 도우미가 잠시 쉬고 있어요. 잠시 뒤에 다시 시도해보세요.';
+const BUSY = '지금 질문이 많아 바로 답하기 어려워요. 잠시 뒤 다시 시도해 보세요.';
+
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         res.setHeader('Allow', 'POST');
@@ -14,7 +18,8 @@ module.exports = async function handler(req, res) {
 
     const apiKey = String(process.env.UPSTAGE_API_KEY || '').trim();
     if (!apiKey) {
-        return res.status(500).json({ error: '서버에 UPSTAGE_API_KEY 환경 변수가 설정되지 않았습니다.' });
+        console.error('UPSTAGE_API_KEY 환경 변수가 없습니다');
+        return res.status(500).json({ error: RESTING });
     }
 
     const keyword = String((req.body && req.body.keyword) || '').trim();
@@ -44,7 +49,9 @@ module.exports = async function handler(req, res) {
         });
 
         if (!response.ok) {
-            return res.status(502).json({ error: 'AI 서버 연동 오류 상태코드: ' + response.status });
+            // 401·403: 키 문제 또는 크레딧 소진, 429: 요청이 너무 많음
+            console.error('Upstage 오류', response.status, (await response.text()).slice(0, 500));
+            return res.status(502).json({ error: response.status === 429 ? BUSY : RESTING });
         }
 
         const responseData = await response.json();
@@ -60,6 +67,6 @@ module.exports = async function handler(req, res) {
         });
     } catch (error) {
         console.error(error);
-        return res.status(502).json({ error: 'AI 응답을 처리하지 못했습니다.' });
+        return res.status(502).json({ error: '도감을 만들지 못했어요. 한 번 더 눌러 보세요.' });
     }
 };

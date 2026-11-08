@@ -154,7 +154,7 @@
 
                 const data = await response.json().catch(() => ({}));
                 if (!response.ok) {
-                    throw new Error(data.error || ('서버 오류 상태코드: ' + response.status));
+                    throw new Error(data.error || 'AI 도우미가 잠시 쉬고 있어요. 잠시 뒤에 다시 시도해보세요.');
                 }
 
                 // 화면 레이아웃 노드에 데이터 결합
@@ -174,7 +174,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert('도감을 가져오는 데 실패했습니다. 원인: ' + error.message);
+                alert(error.message || '도감을 만들지 못했어요. 한 번 더 눌러 보세요.');
                 loadingArea.classList.add('hidden');
             }
         }
